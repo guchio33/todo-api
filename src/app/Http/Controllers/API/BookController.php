@@ -15,15 +15,25 @@ class BookController extends Controller
     public function index(): JsonResponse
     {
         $books = Book::all();
-        return response()->json($books);
+        return response()->json($books, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
+
     {
-        //
+        $Validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'published_year' => 'nullable|integer|min:1000|max:' . date('Y'),
+            'isbn' => 'nullable|string|unique:books,isbn'
+        ]);
+
+        $book = Book::create($Validated);
+        return response()->json($book , 201);
     }
 
     /**
